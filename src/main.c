@@ -7,22 +7,17 @@ int main() {
 
   hashmap *myMap = createMap();
 
-  insertNode(myMap, "chanh", 20);
-  insertNode(myMap, "help", 20);
-  displayMap(myMap);
+  char buffer[122];
 
-  size_t returnSize;
-
-  char **array = getArrayKeyByData(myMap, 20, &returnSize);
-
-  for (size_t i = 0; i < returnSize; i++) {
-    printf("%s ", array[i]);
+  //test for hyperfine
+  for (size_t i = 0; i < 100000; i++) {
+    sprintf(buffer, "buffer %zu\n", i);
+    insertNode(myMap, buffer, i);
   }
 
-  for (size_t i = 0; i < returnSize; i++) {
-    free(array[i]);
-  }
-  free(array);
+  printf("%zu", myMap->capacity);
+
   destroyMap(myMap);
+
   return EXIT_SUCCESS;
 }
