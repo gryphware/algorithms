@@ -136,10 +136,15 @@ unsigned long fnv_1a(const char *key, int capacity) {
 }
 
 void insertNode(hashmap *map, const char *key, int data) {
+
+  if ((float)map->size / map->capacity >= (float)LOAD_FACTOR) {
+    reSize(map);
+  }
+
   unsigned long index = fnv_1a(key, map->capacity);
   node *entry = map->table[index];
   while (entry) {
-   if (strcmp(entry->key, key) == 0) {
+    if (strcmp(entry->key, key) == 0) {
       entry->data = data;
       entry->freq++;
       return;
@@ -149,6 +154,7 @@ void insertNode(hashmap *map, const char *key, int data) {
   node *newNode = createNode(key, data);
   newNode->next = map->table[index];
   map->table[index] = newNode;
+  map->size++;
 }
 
 char *getLastestKeyByData(hashmap *map, int data) {
@@ -165,8 +171,8 @@ char *getLastestKeyByData(hashmap *map, int data) {
   size_t len = strlen(tmp->key);
   char *result = malloc((len + 1) * sizeof(char));
   if (!result) {
-    perror("error: cant malloc at getLastest() (OUT OF MEMORY)");
-    return NULL;
+      perror("error: cant malloc at getLastest() (OUT OF MEMORY)");
+      return NULL;
   }
   memcpy(result, tmp->key, (len + 1));
   return result;
@@ -230,7 +236,31 @@ unsigned long sizes[] = {23,     47,      97,      197,     397,
                          823117, 1646237, 3292489, 6584983, 13169977};
 
 unsigned long nextSize(size_t capacity) {
-
-
+  size_t size = sizeof(sizes) / sizeof(sizes[0]);
+  for (size_t i = 0; i < size; i++) {
+    if(capacity < sizes[i]) return sizes[i];
+  }
+  return capacity * 2 + 1;
 }
-void reSize(hashmap *map);
+
+void reSize(hashmap *map) {
+  size_t oldSize = map->capacity;
+  size_t newSize = nextSize(oldSize);
+
+  node **oldTable = map->table;
+  node **newTable = calloc(newSize, sizeof(node *));
+
+  for (size_t i = 0; i < oldSize; i++) {
+    node *entry = map->table[i];
+    while (entry) {
+      node *next = entry->next;
+      unsigned long index = fnv_1a(entry->key, newSize);
+      entry->next = newTable[index];
+      newTable[index] = entry;
+      entry = next;
+    }
+  }
+  free(oldTable);
+  map->table = newTable;
+  map->capacity = newSize;
+}
