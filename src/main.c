@@ -1,23 +1,20 @@
-#include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include "hashmap.h"
+#include "bst.h"
 
 int main() {
 
-  hashmap *myMap = createMap();
+  node *root = NULL;
 
-  char buffer[122];
-
-  //test for hyperfine
-  for (size_t i = 0; i < 100000; i++) {
-    sprintf(buffer, "buffer %zu\n", i);
-    insertNode(myMap, buffer, i);
+  for (size_t i = 0; i < 1000; i++) {
+    root = insertNode(root, i);
   }
 
-  printf("%zu", myMap->capacity);
+  displayLRN(root);
+  deleteNode(root, 28);
+  displayLRN(root);
 
-  destroyMap(myMap);
+  root = destroyTree(root);
+  root = NULL;
 
   return EXIT_SUCCESS;
 }
