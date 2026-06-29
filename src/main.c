@@ -1,20 +1,15 @@
+#include <stdio.h>
 #include <stdlib.h>
-#include "bst.h"
+
+#include "../include/bubble_sort.h"
 
 int main() {
 
-  node *root = NULL;
-
-  for (size_t i = 0; i < 1000; i++) {
-    root = insertNode(root, i);
-  }
-
-  displayLRN(root);
-  deleteNode(root, 28);
-  displayLRN(root);
-
-  root = destroyTree(root);
-  root = NULL;
+  int arr[] = {12, 4, 56, 76, 0, -2, 100};
+  size_t len = sizeof(arr) / sizeof(arr[0]);
+  print_array(arr, len);
+  bubble(arr, len);
+  print_array(arr, len);
 
   return EXIT_SUCCESS;
 }
